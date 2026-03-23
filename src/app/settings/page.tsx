@@ -130,20 +130,17 @@ export default function SettingsPage() {
           </div>
         </Section>
 
-        {/* Coming soon */}
-        <Section title="Coming soon">
-          <div className="flex flex-col gap-2">
-            {['Reminders & notifications', 'Ambient sounds', 'Check-in sounds', 'React Native mobile app'].map(item => (
-              <div key={item} className="flex items-center justify-between px-4 py-3 rounded-xl opacity-50"
-                style={{ background: 'var(--surface-2)', border: '1.5px solid var(--border)' }}>
-                <span className="text-sm" style={{ color: 'var(--text)' }}>{item}</span>
-                <span className="text-xs font-medium px-2 py-0.5 rounded-full"
-                  style={{ background: 'var(--border)', color: 'var(--text-muted)' }}>
-                  Soon
-                </span>
-              </div>
-            ))}
-          </div>
+        {/* Reminders */}
+        <Section title="Reminders">
+          <DisabledRow label="Night check-in reminder" control={<TimeChip value="10:00 PM" />} />
+          <DisabledRow label="Morning check-in reminder" control={<TimeChip value="8:00 AM" />} />
+        </Section>
+
+        {/* Sound */}
+        <Section title="Sound">
+          <DisabledRow label="Ambient sounds" control={<FakeToggle />} />
+          <DisabledRow label="Check-in sounds" control={<FakeToggle />} />
+          <DisabledRow label="Master volume" control={<FakeSlider />} />
         </Section>
       </div>
     </main>
@@ -162,5 +159,44 @@ function Section({ title, children }: { title: string; children: React.ReactNode
         {children}
       </div>
     </div>
+  )
+}
+
+function DisabledRow({ label, control }: { label: string; control: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between opacity-40 cursor-not-allowed select-none">
+      <span className="text-sm font-medium" style={{ color: 'var(--text)' }}>{label}</span>
+      {control}
+    </div>
+  )
+}
+
+function FakeToggle() {
+  return (
+    <div className="w-11 h-6 rounded-full flex items-center px-0.5"
+      style={{ background: 'var(--border)' }}>
+      <div className="w-5 h-5 rounded-full" style={{ background: 'var(--surface-2)' }} />
+    </div>
+  )
+}
+
+function FakeSlider() {
+  return (
+    <div className="w-24 flex items-center gap-1.5">
+      <div className="flex-1 h-1.5 rounded-full" style={{ background: 'var(--border)' }}>
+        <div className="w-1/2 h-1.5 rounded-full" style={{ background: 'var(--text-muted)' }} />
+      </div>
+      <div className="w-3.5 h-3.5 rounded-full border-2"
+        style={{ background: 'var(--surface)', borderColor: 'var(--text-muted)' }} />
+    </div>
+  )
+}
+
+function TimeChip({ value }: { value: string }) {
+  return (
+    <span className="text-xs font-medium px-3 py-1.5 rounded-lg"
+      style={{ background: 'var(--surface-2)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}>
+      {value}
+    </span>
   )
 }
