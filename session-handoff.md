@@ -9,7 +9,7 @@ Web-first (Next.js) with stated intent to become React Native mobile later.
 - Tailwind v4 (CSS-based config, no tailwind.config.js — `@theme` in globals.css)
 - localStorage only — no backend, no auth
 - Google Fonts: Plus Jakarta Sans
-- Deployed target: Vercel (free hobby tier, no project limit)
+- Deployed: https://dormant-rho.vercel.app/ (Vercel, auto-deploys from main)
 - GitHub: git@github.com:thomas-tahk/Dormant.git
 
 ## IMPORTANT: Next.js 16 / Tailwind v4 Notes
@@ -17,6 +17,7 @@ Web-first (Next.js) with stated intent to become React Native mobile later.
 - Tailwind v4: no config file, custom tokens go in `@theme {}` block in globals.css
 - Dark mode uses `@variant dark (&:where(.dark, .dark *))` — class on `<html>`
 - `'use client'` required on any component using useState, useEffect, localStorage, router
+- Always run `npm run build` locally before pushing — Vercel will catch TypeScript errors that dev server ignores
 
 ## Current Build State
 
@@ -31,7 +32,7 @@ Web-first (Next.js) with stated intent to become React Native mobile later.
 | `/checkin/morning/done` | `src/app/checkin/morning/done/page.tsx` | Completion screen |
 | `/history` | `src/app/history/page.tsx` | Last 7 sessions, read-only |
 | `/insights` | `src/app/insights/page.tsx` | 3 states: empty / learning / ready |
-| `/settings` | `src/app/settings/page.tsx` | Rename, theme, FHIR export, disabled previews |
+| `/settings` | `src/app/settings/page.tsx` | Rename, theme, FHIR export, reset data |
 
 ### Key Source Files
 | File | Purpose |
@@ -42,7 +43,8 @@ Web-first (Next.js) with stated intent to become React Native mobile later.
 | `src/lib/seed.ts` | 7-night demo seed data (SEED_NIGHTS, SEED_MORNINGS) |
 | `src/lib/fhir.ts` | FHIR R4 Bundle export (browser download) |
 | `src/components/ThemeProvider.tsx` | Time-based dark/light context (6am/6pm) |
-| `src/components/companion/DogCompanion.tsx` | SVG dog, 4 states, CSS animations |
+| `src/components/companion/Companion.tsx` | SVG companion, 4 states, CSS animations, tap-to-bounce |
+| `src/components/companion/Habitat.tsx` | Ambient elements that grow with session count |
 | `src/app/globals.css` | Design tokens, keyframes, app-shell frame styling |
 
 ### Design Tokens (globals.css)
@@ -51,7 +53,20 @@ CSS variables on `:root` (light) and `.dark`:
 
 ### Companion States
 `sleeping` | `resting` | `neutral` | `happy`
-- Animations: `idle-float`, `sleeping-breathe`, `happy-bounce`, `tail-wag`, `zzz-float`, `sparkle`
+- Driven by check-in data, NOT time of day
+- sleeping = no entry today, resting = night only, neutral/happy = both done (happy if felt rest was good/great)
+- Tap companion → bounces happy for 2.6s with cooldown (key-based remount for clean animation)
+
+### Habitat System
+`src/components/companion/Habitat.tsx` — rendered behind companion on home screen
+- 1+ complete sessions: 3 soft floating orbs with glow
+- 3+ sessions: warm yellow glowing orb (right side)
+- 5+ sessions: crescent moon (upper left)
+- "Complete session" = night + morning both logged for same date
+- Option A (future): integrate sleep objects into companion SVG itself
+
+### Sleep Inputs (night check-in step 3)
+`caffeine` · `alcohol` · `exercise` · `screens` (label: "Bright screens") · `late-meal` · `nap` · `none`
 
 ### Data Model
 ```
@@ -74,49 +89,35 @@ SleepSession: { date, night?, morning?, durationMinutes? }
 3. Morning check-in (4 steps) → saves → companion state updates
 4. History shows last 7 sessions
 5. Insights → tap "Load demo data" to seed 7 nights → insight card appears
-6. Settings → Export FHIR Bundle → downloads `.json` to Downloads folder
-7. Theme auto-switches at 6am/6pm, manual override in Settings
+6. Settings → Export FHIR Bundle → downloads `.json`
+7. Settings → Reset data (two-tap confirm) → clears all entries
+8. Theme auto-switches at 6am/6pm, manual override in Settings
+9. Tap companion → bounce animation (2.6s, won't re-trigger during cooldown)
+10. Habitat elements appear as session count grows
 
-## What's Missing / Cut
-- No editing past entries (only today can be re-logged, overwrites)
-- No adding entries for past dates manually
-- No stats/history screen (cut from scope — not in demo story)
-- Sound and Reminders are disabled UI only (shown in Settings as coming soon)
-- No real companion animations beyond CSS (no Lottie/Rive)
+## What's Missing / Next Up (priority order)
+1. **Edit past entries** — add edit buttons to history screen, route to pre-filled check-in form
+2. **Progress indicator** — "X of 5 nights to first insight" on home or insights screen
+3. **Streak counter** — consecutive days logged, shown softly on home screen
+4. **Companion habitat Option A** — integrate sleep object (hammock/bed) into companion SVG at milestone
+5. **Gamified check-in** — companion reacts in real-time during check-in steps (v2 scope)
 
-## Visual / UI Notes
-- Desktop: phone frame (430px wide, 40px rounded corners, floating with margin)
-- Dark mode body: deep navy + CSS star pattern + purple glows
-- Light mode body: warm layered gradients (lavender/cream/peach)
-- Sheet pattern: check-ins use `sheet-enter` animation (slides up), `fade-in` per step
-
-## Known Issues / To Fix Next Session
-- Minor: `.dark body` selector may flash on first load (ThemeProvider sets class client-side)
-- The companion `happy-bounce` animation only fires once (needs `infinite` or re-trigger on state change)
-- No scroll on long check-in steps on very small screens (no overflow handling yet)
+## Known Issues
 - History page doesn't auto-refresh after a new check-in (requires navigating away and back)
+- No scroll handling on very small screens during check-in
 
 ## FHIR Export Notes
 Generates FHIR R4 Bundle of Observation resources. LOINC codes used:
 - Sleep duration: `93832-4`
 - Sleep quality (felt rest): `89243-0`
 - Pre-sleep self-report: `44250-9`
-Relevant standard: USCDI (United States Core Data for Interoperability) — sleep diary data
-is recognized as an Assessment data element. Relevant for healthcare interoperability framing
-in the demo presentation.
+Relevant standard: USCDI — sleep diary data is an Assessment data element.
 
-## Git History
+## Git History (recent)
 ```
-0dfcec1  Round phone frame corners, replace coming-soon list with disabled controls
-fd89d86  Add phone-frame outline and day/night background environments
-bdc4171  Scaffold Dormant POC — full app structure and all core screens
-920d8a7  Initial commit — project briefs and wireframe docs
+815a818  Add presentation doc for capstone demo
+0dbdd01  Add companion habitat — ambient elements that grow with session count
+e8c54e5  Fix TypeScript error blocking Vercel build
+a3b101a  Companion rename, tap bounce, visual fixes, sleep inputs, settings clear
+9998a0e  Add session-handoff.md with full build state and next steps
 ```
-
-## Suggested Next Steps (in priority order)
-1. Deploy to Vercel (connect GitHub repo → auto-deploy)
-2. Fix happy-bounce animation (add `key` prop re-trigger or set `infinite`)
-3. Polish: home screen companion glow/habitat feels sparse — consider a soft illustrated ground
-4. Polish: check-in sheet backdrop should show a blurred hint of the home screen behind it
-5. Add ability to seed/clear data from Settings (useful for demo)
-6. Consider a simple "Add past entry" flow for history screen
