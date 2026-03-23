@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { isOnboarded, getSessions, getCompanionName, getTodayDate } from '@/lib/storage'
 import { getCompanionStateFromSessions } from '@/lib/observations'
 import Companion from '@/components/companion/Companion'
+import Habitat from '@/components/companion/Habitat'
 import { CompanionState } from '@/lib/types'
 import Link from 'next/link'
 
@@ -49,6 +50,7 @@ export default function HomePage() {
   const [companionName, setCompanionName] = useState('your companion')
   const [status, setStatus] = useState<ReturnType<typeof getCheckinStatus> | null>(null)
   const [companionState, setCompanionState] = useState<CompanionState>('neutral')
+  const [habitatLevel, setHabitatLevel] = useState(0)
 
   useEffect(() => {
     if (!isOnboarded()) {
@@ -60,6 +62,7 @@ export default function HomePage() {
     setCompanionName(getCompanionName())
     setStatus(getCheckinStatus(today, sessions))
     setCompanionState(getCompanionStateFromSessions(sessions))
+    setHabitatLevel(sessions.filter(s => s.night && s.morning).length)
     setReady(true)
   }, [router])
 
@@ -103,6 +106,8 @@ export default function HomePage() {
             background: 'radial-gradient(circle, var(--accent-soft), transparent 70%)',
             opacity: 0.15,
           }} />
+
+        <Habitat sessionCount={habitatLevel} />
 
         <Companion state={companionState} size={210} />
 
