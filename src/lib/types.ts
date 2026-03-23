@@ -1,5 +1,5 @@
 export type MentalState = 'calm' | 'neutral' | 'wired' | 'anxious'
-export type SleepInput = 'caffeine' | 'alcohol' | 'exercise' | 'screens' | 'none'
+export type SleepInput = 'caffeine' | 'alcohol' | 'exercise' | 'screens' | 'late-meal' | 'nap' | 'none'
 export type FeltRest = 'not-rested' | 'okay' | 'good' | 'great'
 export type WakeDifficulty = 'easy' | 'normal' | 'hard' | 'very-hard'
 export type Interruptions = 'none' | 'once-or-twice' | 'several'

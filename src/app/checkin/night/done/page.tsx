@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import DogCompanion from '@/components/companion/DogCompanion'
+import Companion from '@/components/companion/Companion'
 
 export default function NightDonePage() {
   const router = useRouter()
@@ -9,7 +9,7 @@ export default function NightDonePage() {
   return (
     <div className="flex flex-col min-h-dvh items-center justify-center px-6 text-center"
       style={{ background: 'var(--bg)' }}>
-      <DogCompanion state="sleeping" size={180} />
+      <Companion state="sleeping" size={180} />
       <h2 className="text-2xl font-bold mt-6 mb-3" style={{ color: 'var(--text)' }}>
         Good night
       </h2>

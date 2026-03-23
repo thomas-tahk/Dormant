@@ -1,33 +1,55 @@
 'use client'
 
+import { useState, useRef } from 'react'
 import { CompanionState } from '@/lib/types'
 
-interface DogCompanionProps {
+interface CompanionProps {
   state?: CompanionState
   size?: number
   className?: string
 }
 
-export default function DogCompanion({ state = 'neutral', size = 180, className = '' }: DogCompanionProps) {
+export default function Companion({ state = 'neutral', size = 180, className = '' }: CompanionProps) {
+  const [bouncing, setBouncing] = useState(false)
+  const [bounceKey, setBounceKey] = useState(0)
+  const cooldownRef = useRef(false)
+
+  function handleTap() {
+    if (cooldownRef.current) return
+    cooldownRef.current = true
+    setBouncing(true)
+    setBounceKey(k => k + 1)
+    setTimeout(() => {
+      setBouncing(false)
+      cooldownRef.current = false
+    }, 2600)
+  }
+
+  const displayState: CompanionState = bouncing ? 'happy' : state
+
   const animationStyle = {
     sleeping: { animation: 'sleeping-breathe 4s ease-in-out infinite' },
     resting:  { animation: 'idle-float 4s ease-in-out infinite' },
     neutral:  { animation: 'idle-float 3s ease-in-out infinite' },
     happy:    { animation: 'happy-bounce 0.8s ease-in-out 3' },
-  }[state]
+  }[displayState]
 
   return (
     <svg
+      key={bounceKey}
       viewBox="0 0 160 180"
       width={size}
       height={size}
-      className={className}
+      className={`cursor-pointer select-none ${className}`}
       style={animationStyle}
-      aria-label={`Sleep companion feeling ${state}`}
-      role="img"
+      aria-label={`Sleep companion feeling ${displayState}`}
+      role="button"
+      tabIndex={0}
+      onClick={handleTap}
+      onKeyDown={e => e.key === 'Enter' && handleTap()}
     >
       {/* Tail */}
-      <TailShape state={state} />
+      <TailShape state={displayState} />
 
       {/* Left ear (behind head) */}
       <ellipse
@@ -66,14 +88,14 @@ export default function DogCompanion({ state = 'neutral', size = 180, className 
       <ellipse cx="80" cy="84" rx="20" ry="14" fill="#EEC98A" />
 
       {/* Eyes */}
-      <EyeSet state={state} />
+      <EyeSet state={displayState} />
 
       {/* Nose */}
       <ellipse cx="80" cy="79" rx="6" ry="4" fill="#3A1F0D" />
       <ellipse cx="78" cy="78" rx="2" ry="1.5" fill="#5A3A25" opacity="0.6" />
 
       {/* Mouth */}
-      <MouthShape state={state} />
+      <MouthShape state={displayState} />
 
       {/* Front paws */}
       <ellipse cx="58" cy="165" rx="16" ry="9" fill="#C4914A" />
@@ -92,10 +114,10 @@ export default function DogCompanion({ state = 'neutral', size = 180, className 
       <circle cx="109" cy="169" r="3" fill="#C4914A" />
 
       {/* Sleeping zzz */}
-      {state === 'sleeping' && <ZzzAnimation />}
+      {displayState === 'sleeping' && <ZzzAnimation />}
 
       {/* Happy sparkles */}
-      {state === 'happy' && <HappySparkles />}
+      {displayState === 'happy' && <HappySparkles />}
     </svg>
   )
 }
@@ -104,12 +126,15 @@ function TailShape({ state }: { state: CompanionState }) {
   const isHappy = state === 'happy'
   return (
     <path
-      d={isHappy ? 'M 116 128 Q 145 108 140 130 Q 155 115 148 138' : 'M 118 130 Q 145 115 140 135'}
+      key={isHappy ? 'happy' : 'neutral'}
+      d={isHappy ? 'M 118 130 Q 154 95 150 120' : 'M 118 130 Q 145 115 140 135'}
       stroke="#C4914A"
       strokeWidth="10"
       strokeLinecap="round"
       fill="none"
-      style={isHappy ? { animation: 'tail-wag 0.4s ease-in-out infinite', transformOrigin: '118px 130px' } : {}}
+      style={isHappy
+        ? { animation: 'tail-wag 0.4s ease-in-out infinite', transformOrigin: '118px 130px' }
+        : { animation: 'none', transform: 'none' }}
     />
   )
 }
@@ -134,17 +159,15 @@ function EyeSet({ state }: { state: CompanionState }) {
   if (state === 'resting') {
     return (
       <>
-        {/* Half-open eyes */}
+        {/* Full eye circles */}
         <circle cx={leftX} cy={eyeY} r="7" fill="#3A1F0D" />
         <circle cx={rightX} cy={eyeY} r="7" fill="#3A1F0D" />
-        {/* Droopy lids */}
-        <ellipse cx={leftX} cy={eyeY - 2} rx="7" ry="5" fill="#DBA96B" />
-        <ellipse cx={rightX} cy={eyeY - 2} rx="7" ry="5" fill="#DBA96B" />
-        {/* Small visible eye portion */}
-        <circle cx={leftX} cy={eyeY + 1} r="3.5" fill="#3A1F0D" />
-        <circle cx={rightX} cy={eyeY + 1} r="3.5" fill="#3A1F0D" />
-        <circle cx={leftX + 1} cy={eyeY} r="1" fill="white" />
-        <circle cx={rightX + 1} cy={eyeY} r="1" fill="white" />
+        {/* Heavy lids — arc path in face color, flat bottom gives clean eyelid line */}
+        <path d={`M ${leftX - 7} ${eyeY + 2} A 7 7 0 0 1 ${leftX + 7} ${eyeY + 2} Z`} fill="#DBA96B" />
+        <path d={`M ${rightX - 7} ${eyeY + 2} A 7 7 0 0 1 ${rightX + 7} ${eyeY + 2} Z`} fill="#DBA96B" />
+        {/* Shine on visible lower portion */}
+        <circle cx={leftX + 1} cy={eyeY + 4} r="1" fill="white" opacity="0.6" />
+        <circle cx={rightX + 1} cy={eyeY + 4} r="1" fill="white" opacity="0.6" />
       </>
     )
   }

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { setOnboarded, setCompanionName } from '@/lib/storage'
-import DogCompanion from '@/components/companion/DogCompanion'
+import Companion from '@/components/companion/Companion'
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -43,7 +43,7 @@ export default function OnboardingPage() {
               background: 'radial-gradient(circle, var(--accent-soft), transparent 70%)',
               opacity: 0.18,
             }} />
-          <DogCompanion state="happy" size={200} />
+          <Companion state="happy" size={200} />
         </div>
 
         {/* Copy */}

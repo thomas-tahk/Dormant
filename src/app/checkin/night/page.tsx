@@ -14,11 +14,13 @@ const MENTAL_OPTIONS: { value: MentalState; label: string; emoji: string }[] = [
 ]
 
 const INPUT_OPTIONS: { value: SleepInput; label: string; emoji: string }[] = [
-  { value: 'caffeine',  label: 'Caffeine',      emoji: '☕' },
-  { value: 'alcohol',   label: 'Alcohol',        emoji: '🍷' },
-  { value: 'exercise',  label: 'Exercise',       emoji: '🏃' },
-  { value: 'screens',   label: 'Screens late',   emoji: '📱' },
-  { value: 'none',      label: 'None of these',  emoji: '✨' },
+  { value: 'caffeine',   label: 'Caffeine',      emoji: '☕' },
+  { value: 'alcohol',    label: 'Alcohol',        emoji: '🍷' },
+  { value: 'exercise',   label: 'Exercise',       emoji: '🏃' },
+  { value: 'screens',    label: 'Bright screens', emoji: '📱' },
+  { value: 'late-meal',  label: 'Late meal',      emoji: '🍽️' },
+  { value: 'nap',        label: 'Napped today',   emoji: '😴' },
+  { value: 'none',       label: 'None of these',  emoji: '✨' },
 ]
 
 function getCurrentTime(): string {

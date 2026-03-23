@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getCompanionName, setCompanionName, getSessions } from '@/lib/storage'
+import { getCompanionName, setCompanionName, getSessions, clearAllData } from '@/lib/storage'
 import { useTheme } from '@/components/ThemeProvider'
 import { downloadFhirBundle } from '@/lib/fhir'
 import Link from 'next/link'
@@ -11,6 +11,7 @@ export default function SettingsPage() {
   const [name, setName] = useState('')
   const [saved, setSaved] = useState(false)
   const [exported, setExported] = useState(false)
+  const [confirmClear, setConfirmClear] = useState(false)
 
   useEffect(() => {
     setName(getCompanionName())
@@ -20,6 +21,16 @@ export default function SettingsPage() {
     setCompanionName(name)
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  function handleClear() {
+    if (!confirmClear) {
+      setConfirmClear(true)
+      setTimeout(() => setConfirmClear(false), 3000)
+      return
+    }
+    clearAllData()
+    setConfirmClear(false)
   }
 
   function handleExport() {
@@ -125,6 +136,24 @@ export default function SettingsPage() {
                   border: exported ? '1.5px solid var(--border)' : 'none',
                 }}>
                 {exported ? 'Downloaded ✓' : 'Export FHIR Bundle'}
+              </button>
+            </div>
+
+            <div>
+              <p className="text-sm font-medium mb-1" style={{ color: 'var(--text)' }}>
+                Reset all data
+              </p>
+              <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
+                Clears all sleep entries. Useful for testing or starting fresh.
+              </p>
+              <button onClick={handleClear}
+                className="w-full py-3 rounded-xl font-semibold text-sm transition-all active:scale-95"
+                style={{
+                  background: confirmClear ? '#E07070' : 'var(--surface-2)',
+                  color: confirmClear ? 'white' : 'var(--text-muted)',
+                  border: `1.5px solid ${confirmClear ? '#E07070' : 'var(--border)'}`,
+                }}>
+                {confirmClear ? 'Tap again to confirm' : 'Reset data'}
               </button>
             </div>
           </div>

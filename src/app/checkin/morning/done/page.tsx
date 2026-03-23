@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { getSessions, getTodayDate } from '@/lib/storage'
-import DogCompanion from '@/components/companion/DogCompanion'
+import Companion from '@/components/companion/Companion'
 
 export default function MorningDonePage() {
   const router = useRouter()
@@ -16,7 +16,7 @@ export default function MorningDonePage() {
   return (
     <div className="flex flex-col min-h-dvh items-center justify-center px-6 text-center"
       style={{ background: 'var(--bg)' }}>
-      <DogCompanion state={companionState} size={180} />
+      <Companion state={companionState} size={180} />
       <h2 className="text-2xl font-bold mt-6 mb-3" style={{ color: 'var(--text)' }}>
         Good morning
       </h2>

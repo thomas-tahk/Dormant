@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { isOnboarded, getSessions, getCompanionName, getTodayDate } from '@/lib/storage'
 import { getCompanionStateFromSessions } from '@/lib/observations'
-import DogCompanion from '@/components/companion/DogCompanion'
+import Companion from '@/components/companion/Companion'
 import { CompanionState } from '@/lib/types'
 import Link from 'next/link'
 
@@ -104,7 +104,7 @@ export default function HomePage() {
             opacity: 0.15,
           }} />
 
-        <DogCompanion state={companionState} size={210} />
+        <Companion state={companionState} size={210} />
 
         {/* Companion name */}
         <p className="text-sm mt-3 font-medium" style={{ color: 'var(--text-muted)' }}>
