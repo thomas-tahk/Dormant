@@ -143,7 +143,7 @@ function FactCard({ fact }: { fact: string }) {
 function ObservationCard({ observation }: { observation: Observation }) {
   return (
     <div className="p-5 rounded-2xl flex flex-col gap-4"
-      style={{ background: 'var(--surface-2)', border: '1.5px solid var(--accent)', borderOpacity: 0.3 }}>
+      style={{ background: 'var(--surface-2)', border: '1.5px solid color-mix(in srgb, var(--accent) 40%, transparent)' }}>
       <div>
         <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text)' }}>
           {observation.title}
